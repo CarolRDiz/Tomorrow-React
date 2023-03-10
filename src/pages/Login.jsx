@@ -91,6 +91,9 @@ const Login = () => {
     //LOCAL STORAGE USUARIOS REGISTRADOS
     window.localStorage.setItem("users", JSON.stringify(users));
     console.log("Local Storage Usuarios Registrados: "+ window.localStorage.getItem('users'))
+    window.localStorage.setItem("name", name);
+    window.localStorage.setItem("name", name);
+    window.localStorage.setItem("fecha-nac", fecha);
     setDatos(datosInitialState)
     setError(null)
     setUser(true)
@@ -109,16 +112,22 @@ const Login = () => {
       console.log('Iniciando sesión...')
           setUser(true)
           //LOCAL STORAGE USUARIO SESIÓN
-          window.localStorage.setItem("name", name);
+          window.localStorage.setItem("name", userRegistered.name);
           window.localStorage.setItem("pass", pass);
+          window.localStorage.setItem("fecha-nac", userRegistered.fecha);
           console.log("Nombre: "+ window.localStorage.getItem('name'))
+          Swal.fire({
+            title: 'Éxito',
+            text: 'Has iniciado sesión',
+            icon: 'success',
+          })
           setDatos(datosInitialState)
           setError(null)
           navigate('/dashboard')
     }
     else
     {
-      setError("La contraseña o el email son incorrectos.")
+      setError("La contraseña o el email no están registrados.")
       return
     }
     /*

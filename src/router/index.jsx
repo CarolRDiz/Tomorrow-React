@@ -45,12 +45,10 @@ export const router = createBrowserRouter([
             {
                 path: "/busqueda",
                 element: <Busqueda />,
-                children: [
-                    {
-                        index: true,
-                        element: <Prediccion/>
-                    }
-                ]
+            },
+            {
+                path: "/prediccion/:communityName/:provinceName",
+                element: <Prediccion />,
             },
             {
                 path: "/contacto",

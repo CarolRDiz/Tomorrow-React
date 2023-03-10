@@ -1,8 +1,11 @@
-/*import React, { useState } from 'react'
+import React, { useState } from 'react'
 import queryString from 'query-string';
 import { addHours } from "../utilities";
 
-const fetchForecast = (latitude, latitude, hourly, dialy, timesteps) => {
+const FetchForecast = (
+    //latitude, longitude
+    //latitude, latitude, hourly, dialy, timesteps
+    ) => {
 
     const [forecastData, setForecastData] = useState({});
     const [hasError, setHasError] = useState(false);
@@ -12,13 +15,16 @@ const fetchForecast = (latitude, latitude, hourly, dialy, timesteps) => {
 
     //Escoger una ubicacion con coordenadas. Madrid
     let latitude = 40.42;
-    let latitude = -3.70;
+    let longitude = -3.70;
+    // const latitudeFloat = parseFloat(latitude)
+    // const longitudeFloat = parseFloat(longitude)
+    // console.log(latitudeFloat)
 
     //Variables de tiempo por hora
     const hourly = "weathercode"
 
     //Variables de tiempo por día
-    const dialy = "weathercode"
+    const dialy = ["temperature_2m_max","temperature_2m_min","sunrise","sunset","rain_sum","windspeed_10m_max"]
 
     const timezone="Europe/London"
 
@@ -29,9 +35,32 @@ const fetchForecast = (latitude, latitude, hourly, dialy, timesteps) => {
     const timesteps = ["current", "1h", "1d"];
 
     // Configurar el marco de tiempo hasta 6 horas anteriores y 15 días siguientes
-    const start_date = "2023-01-17";
+    function formatDaysAndMonth (dayOrMonth) {
+        if(dayOrMonth.toString().length == 1) {
+            dayOrMonth ='0'+dayOrMonth.toString();
+        }
+        return dayOrMonth
+    }
+    const currentDate = new Date();
+    var currentYear = currentDate.getFullYear();
+    var currentDay = currentDate.getDate();
+    currentDay = formatDaysAndMonth(currentDay)
+    var currentMonth = currentDate.getMonth() + 1;
+    currentMonth = formatDaysAndMonth(currentMonth)
+    const start_date = `${currentYear}-${currentMonth}-${currentDay}`
+    //const start_date = "2023-01-17";
     console.log("start_date: "+ start_date)
-    const end_date = "2023-01-19";
+
+
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 7);
+    var endYear = endDate.getFullYear();
+    var endDay = endDate.getDate();
+    endDay = formatDaysAndMonth(endDay)
+    var endMonth = endDate.getMonth() + 1;
+    endMonth = formatDaysAndMonth(endMonth)    
+    const end_date = `${endYear}-${endMonth}-${endDay}`
+    //const end_date = "2023-01-19";
     console.log("end_date: "+ end_date)
 
     //Solicitar las líneas de tiempo con todos los 
@@ -53,6 +82,7 @@ const fetchForecast = (latitude, latitude, hourly, dialy, timesteps) => {
     .then((data) => console.log(data))
     .then((data) => setForecastData(data))
 
+
     /*
     .then((result) => {
         console.log("FETCH: result.json()")
@@ -64,10 +94,15 @@ const fetchForecast = (latitude, latitude, hourly, dialy, timesteps) => {
     })
     .catch(() => setHasError(true))
     console.log(JSON.stringify(response))
-    
+    */
     return (
-        forecastData
+        <div>
+           Fetch
+        </div>
+        
     )
+
 }
-*/
+
+export default FetchForecast
 //https://api.tomorrow.io/v4/timelines?apikey=ryo20D3hDThJDKt0zPQka1TgkyUGFT5B&location=63c42f917cbd99c48eeab3a8&fields=weatherCode&units=metric
