@@ -6,6 +6,3 @@ Tras clonarlo:
 
 Localhost:
 `npm run dev`
-
-Axios:
-`npm install axios`
