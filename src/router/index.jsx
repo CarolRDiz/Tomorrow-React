@@ -23,7 +23,7 @@ export const router = createBrowserRouter([
         // son children, heredan el LayoutPublic
             {
                 index: true,
-                element: <Home />,
+                element: <Busqueda />,
             },
             /*
             {
@@ -41,10 +41,6 @@ export const router = createBrowserRouter([
             {
                 path: "/registro",
                 element: <Registro />,
-            },
-            {
-                path: "/busqueda",
-                element: <Busqueda />,
             },
             {
                 path: "/prediccion/:communityName/:provinceName",

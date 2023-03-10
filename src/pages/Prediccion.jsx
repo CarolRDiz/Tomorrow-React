@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import queryString from 'query-string';
 import { useParams } from 'react-router-dom'
-import FetchForecast from '../components/FetchForecast'
 import axios from 'axios'
+import HourlyWeather from '../components/HourlyWeather';
 import despejado from "../assets/img/weathercode/despejado.svg"
 import despejado_noche from "../assets/img/weathercode/despejado_noche.svg"
 import principlamente_despejado from "../assets/img/weathercode/nube.svg"
@@ -51,9 +51,8 @@ const Prediccion = () => {
 
   const [latitude, setLatitude] = useState(null)
   const [longitude, setLongitude] = useState(null)
-  const [forecastData, setForecastData] = useState(null);
   const [hasError, setHasError] = useState(false);
-  const [hourly, setHourly] = useState(null);
+  const [hours, setHours] = useState(null);
   const [current_weather, setCurrentWeather] = useState(null)
   const [temperatures, setTemperatures] = useState(null)
   const [weathercodes, setWeathercodes] = useState(null)
@@ -70,8 +69,17 @@ const Prediccion = () => {
   var { communityName, provinceName } = useParams()
   const URL = `https://geocoding-api.open-meteo.com/v1/search?name=${provinceName}&language=es&count=1`
 
-  useEffect(() => {
+  const [thanksDisplay, setThanksDisplay] = useState(false)
 
+  useEffect(() => {
+    setThanksDisplay(true);
+    setTimeout(() => {
+      setThanksDisplay(false);
+    }, 3000);
+  },[])
+  
+  
+  useEffect(() => {
     const getCoordenates = async () => {
       const URL = `https://geocoding-api.open-meteo.com/v1/search?name=${provinceName}&language=es&count=1`
       const result = await axios.get(URL)
@@ -127,7 +135,6 @@ const Prediccion = () => {
       currentMonth = formatDaysAndMonth(currentMonth)
       const start_date = `${currentYear}-${currentMonth}-${currentDay}`
       //const start_date = "2023-01-17";
-      console.log("start_date: " + start_date)
 
 
       const endDate = new Date();
@@ -139,13 +146,10 @@ const Prediccion = () => {
       endMonth = formatDaysAndMonth(endMonth)
       const end_date = `${endYear}-${endMonth}-${endDay}`
       //const end_date = "2023-01-19";
-      console.log("end_date: " + end_date)
 
       const current_weather = true;
 
-      // Solicitar las líneas de tiempo con todos los 
-      // parámetros de la cadena de consulta como opciones 
-
+      // Solicitar las líneas de tiempo con todos los parámetros de la cadena de consulta como opciones 
       const getForecastParameters = queryString.stringify({
         latitude,
         longitude,
@@ -157,18 +161,16 @@ const Prediccion = () => {
         start_date,
         end_date,
       }, { arrayFormat: "comma" });
-      console.log("getForecastParameters: " + getForecastParameters)
 
+      console.log("getForecastParameters: " + getForecastParameters)
+      
       let forecastURL = getForecastURL + "?" + getForecastParameters;
-      // fetch(getForecastURL + "?" + getForecastParameters, {method: "GET", compress: true})
-      // .then((res) => res.json())
-      // .then((data) => console.log(data))
-      // .then((data) => setForecastData(data))
 
       const result = await axios.get(forecastURL)
-      setForecastData(result.data)
+
       console.log(result.data)
       setCurrentWeather(result.data.current_weather)
+      setHours(result.data.hourly.time)
       setTemperatures(result.data.hourly.temperature_2m)
       setWeathercodes(result.data.hourly.weathercode)
       setRainSums(result.data.daily.rain_sum)
@@ -193,6 +195,10 @@ const Prediccion = () => {
     let date = new Date(dateString)
     return date.getDate()
   }
+  function getMonth(dateString){
+    let date = new Date(dateString)
+    return new Intl.DateTimeFormat('es-ES', { month: 'long'}).format(date);
+  }
   function getDayWeek(dateString) {
     const dias = [
       'Domingo',
@@ -209,6 +215,43 @@ const Prediccion = () => {
     return dias[date.getDay()]
   }
 
+
+  /* LÓGICA DEL COMPONENTE HOURLYWEATHER */
+
+  const ITEMS_PER_PAGE = 10; 
+  const [hourItems, setHourItems] = useState([])
+  const [temperatureItems, setTemperatureItems] = useState([])
+  const [currentPage, setCurrentPage] = useState(0)
+
+  useEffect(()=> {
+    if(hours) setHourItems([...hours].splice(0, ITEMS_PER_PAGE))
+    if(temperatures) setTemperatureItems([...temperatures].splice(0, ITEMS_PER_PAGE))
+  },[hours,temperatures])
+
+  // Pasar a la siguiente página
+  const nextHandler = () => {
+    const totalItems = hours.length
+    const nextPage = currentPage + 1
+    const firstIndex = nextPage * ITEMS_PER_PAGE
+    if(firstIndex > totalItems) return;
+    setHourItems([...hours].splice(firstIndex, ITEMS_PER_PAGE))
+    setTemperatureItems([...temperatures].splice(firstIndex, ITEMS_PER_PAGE))
+    setCurrentPage(nextPage)
+  }
+  // Volver a la anterior página
+  const prevHandler = () => {
+    const prevPage = currentPage - 1;
+    if ( prevPage < 0 ) return;
+    const firstIndex = prevPage * ITEMS_PER_PAGE
+    setHourItems([...hours].splice(firstIndex, ITEMS_PER_PAGE))
+    setTemperatureItems([...temperatures].splice(firstIndex, ITEMS_PER_PAGE))
+    setCurrentPage(prevPage)
+  }
+
+  const getDateComplete = (date) => {
+    return getDayWeek(date) + ' ' + getDayMonth(date) + ' de ' + getMonth(date)
+  }
+
   if (isLoading) { // si está cargando, mostramos un texto que lo indique
     return (
       <div>
@@ -219,6 +262,9 @@ const Prediccion = () => {
 
   return (
     <main>
+      {thanksDisplay && <span className='thanks'>
+        Gracias por usar nuesta aplicación
+        </span>}
       <section className="main__city">
         <div className="city__block-1">
           <h1>{communityName}</h1>
@@ -299,6 +345,7 @@ const Prediccion = () => {
           </div>
         </div>
       </section>
+      <HourlyWeather currentPage={currentPage} temperatureItems={temperatureItems} hourItems={hourItems} nextHandler={nextHandler} prevHandler={prevHandler} getDateComplete={getDateComplete} getHoursfromDate={getHoursfromDate}/>
     </main>
   )
 }

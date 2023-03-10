@@ -39,51 +39,12 @@ const Navbar = () => {
                     </li>
                     )
                 }
-                {/* 
-                {
-                    user || (
-                        <li className="menu__li">
-                            <NavLink className="menu__link" to="/registro">
-                                Registro
-                            </NavLink>
-                        </li>)
-                }
-                {user && (
-                    <li className="menu__li">
-                        <NavLink className="menu__link" to="/perfil">
-                            Perfil
-                        </NavLink>
-                    </li>
-                )
-                }
-                {
-                    user ? (
-                        <button onClick={() => cerrarSesion()}>
-                            Cerrar
-                            
-                        </button>
-                    ) :
-                        (
-                            <li className="menu__li">
-                                <NavLink className="menu__link" to="/login">
-                                    Login
-                                </NavLink>
-                            </li>
-                        )
-                }
-                */}
                 <li className="menu__li">
                     <NavLink className="menu__link" to="/contacto">
                         Contacto
                     </NavLink>
                 </li>
                 
-                
-                <li className="menu__li">
-                    <NavLink className="menu__link" to="/busqueda">
-                        Búsqueda
-                    </NavLink>
-                </li>
             </ul>
         </nav>
     );
